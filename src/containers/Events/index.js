@@ -13,25 +13,27 @@ const EventList = () => {
   const { data, error } = useData();
   const [type, setType] = useState();
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Filtrage des événements par type et pagination
   const filteredEvents = (
     (!type
-      ? data?.events
-      : data?.events) || []
-  ).filter((event, index) => {
-    if (
-      (currentPage - 1) * PER_PAGE <= index &&
-      PER_PAGE * currentPage > index
-    ) {
-      return true;
-    }
-    return false;
-  });
+      ? data?.events // Tous les événements si aucun type sélectionné
+      : data?.events.filter((event) => event.type === type)) || [] // Filtrer par type
+  ).filter((event, index) =>
+    (currentPage - 1) * PER_PAGE <= index &&
+    PER_PAGE * currentPage > index
+  );
+
+
   const changeType = (evtType) => {
-    setCurrentPage(1);
+    setCurrentPage(1); // Réinitialiser à la première page lors du changement de type
     setType(evtType);
   };
-  const pageNumber = Math.floor((filteredEvents?.length || 0) / PER_PAGE) + 1;
+
+  const pageNumber = Math.ceil((filteredEvents?.length || 0) / PER_PAGE);
   const typeList = new Set(data?.events.map((event) => event.type));
+
+
   return (
     <>
       {error && <div>An error occured</div>}
@@ -41,7 +43,7 @@ const EventList = () => {
         <>
           <h3 className="SelectTitle">Catégories</h3>
           <Select
-            selection={Array.from(typeList)}
+            selection={Array.from(typeList)} // Liste des types d'événements
             onChange={(value) => (value ? changeType(value) : changeType(null))}
           />
           <div id="events" className="ListContainer">
@@ -61,8 +63,7 @@ const EventList = () => {
           </div>
           <div className="Pagination">
             {[...Array(pageNumber || 0)].map((_, n) => (
-              // eslint-disable-next-line react/no-array-index-key
-              <a key={n} href="#events" onClick={() => setCurrentPage(n + 1)}>
+              <a key={`page-${n + 1}`} href="#events" onClick={() => setCurrentPage(n + 1)}>
                 {n + 1}
               </a>
             ))}

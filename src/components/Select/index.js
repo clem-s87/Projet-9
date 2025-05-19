@@ -16,9 +16,10 @@ const Select = ({
   const [value, setValue] = useState();
   const [collapsed, setCollapsed] = useState(true);
   const changeValue = (newValue) => {
-    onChange();
+
     setValue(newValue);
-    setCollapsed(newValue);
+    setCollapsed(true); // Fermer le menu après sélection
+    onChange(newValue); // Appeler la fonction passée en prop
   };
   return (
     <div className={`SelectContainer ${type}`} data-testid="select-testid">
@@ -39,7 +40,7 @@ const Select = ({
               {selection.map((s) => (
                 <li key={s} onClick={() => changeValue(s)}>
                   <input
-                    defaultChecked={value === s}
+                    checked={!value}
                     name="selected"
                     type="radio"
                   />{" "}
